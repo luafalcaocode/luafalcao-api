@@ -9,7 +9,7 @@ This repo hosts my personal web site API with functionalities to upload files to
 - run npm start or press F5 for debug
 - call an API endpoint (e.g: servicos/api/solicitacao) using port 4002 for https or 40001 for http (to use https you'll need to configure a certificate key before as I did in development mode. You can use Open SSL to achieve this)
 
-# Techonologies
+# Technologies
 
 - Node js
 - Nodemailer
