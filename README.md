@@ -2,7 +2,7 @@
 
 This repo hosts my personal web site API with functionalities to upload files to the server and send e-mail with user received data 
 
-# Settings
+# Getting Started
 
 - run npm install
 - npm start or f5 for debub
