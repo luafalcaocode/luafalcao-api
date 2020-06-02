@@ -4,14 +4,14 @@ This repo hosts my personal web site API with functionalities to upload files to
 
 # Getting Started
 
-- open shell, execute on terminal the command "git clone https://github.com/luafalcaocode/luafalcao-api" and navigate to repo folder
+- open shell, execute the command "git clone https://github.com/luafalcaocode/luafalcao-api" and navigate to repo folder
 - run npm install
-- npm start or f5 for debug
-- call an API endpoint using port 4002 for https or 40001 for http (to use https you'll need to configure a certificate key before as I did in development mode. You can use Open SSL to this)
+- run npm start or press F5 for debug
+- call an API endpoint (e.g: servicos/api/solicitacao) using port 4002 for https or 40001 for http (to use https you'll need to configure a certificate key before as I did in development mode. You can use Open SSL to achieve this)
 
 # Techonologies
 
-- nodejs
-- nodemailer
-- expressjs
-- nodemon
+- Node js
+- Nodemailer
+- Express js
+- Nodemon
