@@ -4,9 +4,10 @@ This repo hosts my personal web site API with functionalities to upload files to
 
 # Getting Started
 
+- open shell, execute on terminal the command "git clone https://github.com/luafalcaocode/luafalcao-api" and navigate to repo folder
 - run npm install
-- npm start or f5 for debub
-- call an API endpoint using port 4002 for https or 40001 for http (to use https you'll to configure a certificate key before as I did in development mode. You can use Open SSL to this)
+- npm start or f5 for debgb
+- call an API endpoint using port 4002 for https or 40001 for http (to use https you'll need to configure a certificate key before as I did in development mode. You can use Open SSL to this)
 
 #techonologies
 
