@@ -46,6 +46,7 @@ router.post('/solicitacao', (request, response, next) => {
                    </ul>`
         };
 
+      
         let stream;
         fs.readdir(path.join(__dirname, '../', 'uploads'), (err, files) => {
             files.forEach(file => {
@@ -54,14 +55,18 @@ router.post('/solicitacao', (request, response, next) => {
 
             });
             transporter.sendMail(mailOptions, (err, info) => {
-                console.log(info.response);
                 files.forEach(file => {
                     fs.unlink(path.join(__dirname, '../', 'uploads', '/', file), err => {
                         if (err)
                             console.log(err);
                     });
                 });
-                response.end();
+                if (!err){
+                    response.status(200).send({ message: 'the data was sent successfuly!', success: true });
+                }
+                else {
+                    response.status(400).send({ message: `${err.name}: ${err.message}`, success: false });
+                }
             });
         });
     });

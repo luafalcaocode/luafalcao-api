@@ -17,6 +17,6 @@ app.use(cors());
 app.use('/api/servicos', solicitacaoServicoRoutes);
 
 
-httpServer.listen(40001);
-httpsServer.listen(4002);
+httpServer.listen(7777);
+httpsServer.listen(9999);
 // app.listen(4100);
