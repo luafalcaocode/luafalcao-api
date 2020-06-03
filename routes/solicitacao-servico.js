@@ -14,21 +14,14 @@ router.post('/solicitacao', (request, response, next) => {
         fs.rename(file.path, path.join(form.uploadDir, file.name), () => {
         });
     });
-    form.on('error', (error) => {
-        console.log(error);
-    });
-    form.on('end', () => {
-        console.log('arquivos recebidos no servidor');
-    });
     form.parse(request, (err, fields, files) => {
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: 'adicionar_email_disparador_aqui',
-                    pass: 'adicionar_senha_disparador_aqui'
-                }
-            });
-
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'adicionar_email_disparador_aqui',
+                pass: 'adicionar_senha_disparador_aqui'
+            }
+        });
         const mailOptions = {
             from: 'adicionar_email_remetente_aqui',
             to: 'adicionar_email_destinatario_aqui',
@@ -45,14 +38,11 @@ router.post('/solicitacao', (request, response, next) => {
                         <li>${fields.tipoDeProjeto}</li>
                    </ul>`
         };
-
-      
         let stream;
         fs.readdir(path.join(__dirname, '../', 'uploads'), (err, files) => {
             files.forEach(file => {
                 stream = fs.createReadStream(path.join(__dirname, '../', 'uploads', file));
                 mailOptions.attachments.push({ filename: file, content: stream });
-
             });
             transporter.sendMail(mailOptions, (err, info) => {
                 files.forEach(file => {
@@ -61,7 +51,7 @@ router.post('/solicitacao', (request, response, next) => {
                             console.log(err);
                     });
                 });
-                if (!err){
+                if (!err) {
                     response.status(200).send({ message: 'the data was sent successfuly!', success: true });
                 }
                 else {
