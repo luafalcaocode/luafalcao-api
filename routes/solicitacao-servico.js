@@ -5,7 +5,7 @@ const fs = require("fs");
 const nodemailer = require("nodemailer");
 const router = express.Router();
 
-const config = require('../config.public');
+const config = require('../config/config');
 
 router.post("/solicitacao", (request, response, next) => {
   const form = new formidable.IncomingForm();
