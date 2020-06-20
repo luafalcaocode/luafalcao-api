@@ -12,7 +12,16 @@ router.post("/solicitacao", (request, response, next) => {
   form.multiples = true;
   form.uploadDir = path.join(__dirname, "../", "uploads");
 
+  fs.access(form.uploadDir, (err) => {
+    if (err && err.code === 'ENOENT') {
+      fs.mkdir(form.uploadDir, (err) => {
+        console.log(err);
+      });
+    }
+  });
+
   form.on("file", (field, file) => {
+    console.log('arquivo: ' + file);
     fs.rename(file.path, path.join(form.uploadDir, file.name), () => {});
   });
 
