@@ -5,23 +5,23 @@ const fs = require("fs");
 const nodemailer = require("nodemailer");
 const router = express.Router();
 
-const config = require('../config/config');
+const config = require("../config/config");
 
 router.post("/solicitacao", (request, response, next) => {
   const form = new formidable.IncomingForm();
+
   form.multiples = true;
   form.uploadDir = path.join(__dirname, "../", "uploads");
 
   fs.access(form.uploadDir, (err) => {
-    if (err && err.code === 'ENOENT') {
+    if (err && err.code === "ENOENT") {
       fs.mkdir(form.uploadDir, (err) => {
         console.log(err);
       });
     }
   });
 
-  form.on("file", (field, file) => {
-    console.log('arquivo: ' + file);
+  form.on("file", (field, file) => {    
     fs.rename(file.path, path.join(form.uploadDir, file.name), () => {});
   });
 
@@ -65,28 +65,40 @@ router.post("/solicitacao", (request, response, next) => {
     };
 
     let stream;
+    let array = [];
+
     fs.readdir(config.uploadDir, (err, files) => {
-      files.forEach((file) => {
-        stream = fs.createReadStream(path.join(config.uploadDir, file));
-        mailOptions.attachments.push({ filename: file, content: stream });
-      });
-      transporter.sendMail(mailOptions, (err, info) => {
-        files.forEach((file) => {
-          fs.unlink(path.join(config.uploadDir, "/", file), (err) => {
-            if (err) console.log(err);
+      OpenFilesAsStreamAsync(files)
+        .then((data) => {
+          if (data != null && data.length > 0) {
+            data.forEach((item) => {
+              mailOptions.attachments.push({
+                filename: item.name,
+                content: item.bytes,
+              });
+            });
+          }
+        })
+        .then(() => {
+          transporter.sendMail(mailOptions, (err) => {
+            if (!err) {
+              response.status(config.statusCode.success).send({
+                message: "the data was sent successfuly!",
+                success: true,
+              });   
+              RemoveFilesAsync(files).then(() => {                                   
+              })
+              .catch((reason) => {
+                console.log(reason);
+              });
+            } else {
+              response.status(config.statusCode.bad).send({
+                message: `${err.name}: ${err.message}`,
+                success: false,
+              });
+            }
           });
         });
-
-        if (!err) {
-          response
-            .status(config.statusCode.success)
-            .send({ message: "the data was sent successfuly!", success: true });
-        } else {
-          response
-            .status(config.statusCode.bad)
-            .send({ message: `${err.name}: ${err.message}`, success: false });
-        }
-      });
     });
   });
 });
@@ -94,5 +106,32 @@ router.post("/solicitacao", (request, response, next) => {
 router.get("/solicitacao", (request, response, next) => {
   response.send("<h1>API works</h1>");
 });
+
+async function OpenFilesAsStreamAsync(files) {
+  const stream = [];
+  let temp = [];
+
+  for await (const file of files) {
+    for await (const chunk of fs.createReadStream(
+      path.join(config.uploadDir, file)
+    )) {
+      temp.push(chunk);
+    }
+   
+    stream.push({ name: file, bytes: Buffer.concat(temp) });
+    temp = [];
+  }
+
+  return stream;
+}
+
+async function RemoveFilesAsync(files) {
+    for await (const file of files) {
+      fs.unlink(path.join(config.uploadDir, "/", file), (err) => {
+        if (err)
+          console.log(err);
+      });
+    }  
+}
 
 module.exports = router;

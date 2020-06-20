@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const bodyParser = require('body-parser');
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
@@ -15,7 +14,6 @@ const config = require('./config/config');
 app.set('view engine', 'pug');
 app.set('views', 'views');
 
-app.use(bodyParser.urlencoded({extended: false}))
 app.use(express.static(config.publicFolder)); 
 
 app.use(cors());
@@ -24,5 +22,5 @@ app.use((request, response, next) => {
     response.status(config.statusCode.notFound).render('404');
 });
 
-httpServer.listen(7777);
-httpsServer.listen(8091);
+httpServer.listen(5511);
+httpsServer.listen(3333);
