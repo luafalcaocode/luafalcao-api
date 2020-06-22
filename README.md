@@ -19,3 +19,4 @@ And also, of course, in config file you'll need to set your email/smtp config su
 - Nodemailer
 - Express js
 - Nodemon
+- Formidable
