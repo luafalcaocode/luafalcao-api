@@ -62,7 +62,7 @@ router.post("/solicitacao", (request, response, next) => {
           .then(() => {
             emailService
               .send(emailModel)
-              .then((err) => {
+              .then(() => {
                 response.status(config.statusCode.success).send({
                   message: "the data was sent successfuly!",
                   success: true,
@@ -75,16 +75,14 @@ router.post("/solicitacao", (request, response, next) => {
                   });
               })
               .catch((err) => {
-                console.log(err);
                 response.status(config.statusCode.boom).send({ message: err.response, success: false});
               });
           });
       });
     } else {
       response
-        .status(config.statusCode.boom)
-        .send({ message: err, success: false });
-      console.log("OCORREU UM ERRO: " + err);
+        .status(config.statusCode.bad)
+        .send({ message: err.message, success: false });
     }
   });
 });
