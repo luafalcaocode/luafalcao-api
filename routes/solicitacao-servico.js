@@ -1,5 +1,6 @@
 const config = require("../config/config");
 const emailModel = require("../models/email.model");
+const emailService = require("../services/email.service");
 const fileService = require("../services/file.service");
 
 const express = require("express");
@@ -7,7 +8,7 @@ const formidable = require("formidable");
 const fs = require("fs");
 const nodemailer = require("nodemailer");
 const path = require("path");
-const emailService = require("../services/email.service");
+
 const router = express.Router();
 
 router.post("/solicitacao", (request, response, next) => {
@@ -25,12 +26,12 @@ router.post("/solicitacao", (request, response, next) => {
   });
 
   form.on("file", (field, file) => {
-    fs.rename(file.path, path.join(form.uploadDir, file.name), () =>{});
+    fs.renameSync(file.path, path.join(form.uploadDir, file.name));
   });
 
   form.parse(request, (err, fields, files) => {
     if (!err) {
-      emailModel.credentials = {
+      emailModel.credentials = {  
         user: config.email.credentials.user,
         password: config.email.credentials.password,
       };
@@ -42,9 +43,9 @@ router.post("/solicitacao", (request, response, next) => {
         attachments: [],
       };
       emailModel.smtp = config.email.smtp;
-      
-      fs.readdir(config.uploadDir, (err, files) => {
-        fileService.openFilesAsStreamAsync(files).then((data) => {
+
+      fs.readdir(config.uploadDir, (err, filenames) => {
+        fileService.openFilesAsStreamAsync(filenames).then((data) => {
             if (data != null && data.length > 0) {
               data.forEach((item) => {
                 emailModel.options.attachments.push({
@@ -55,11 +56,11 @@ router.post("/solicitacao", (request, response, next) => {
            
               emailService.send(emailModel).then(() => {
                 response.status(config.statusCode.success).send({message: "the data was sent successfuly!", success: true});                
-                fileService.removeFilesAsync(files).then(() => {
+                fileService.removeFilesAsync(filenames).then(() => {
                   console.log('file removed');
                 })
-                .catch((reason) => {
-                   response.status(config.statusCode.boom).send({ message: err.message, success: false});
+                .catch((err) => {
+                   console.log(err);
                 });
               })
               .catch((err) => {
