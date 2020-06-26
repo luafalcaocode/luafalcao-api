@@ -23,14 +23,14 @@ const fileService = {
 
   removeFilesAsync: async (files) => {
     for await (const file of files) {
-      //let absolutePath = path.join(config.uploadDir, '/', file);
-     // fs.exists(absolutePath, (exists) => {
-      //  if (exists) {
+      let absolutePath = path.join(config.uploadDir, '/', file);
+     fs.exists(absolutePath, (exists) => {
+       if (exists) {
           fs.unlink(path.join(config.uploadDir, '/', file), (err) => {
             if (err) console.log(err);
           });
-     //   }       
-     // });    
+       }       
+     });    
     }
   }
 };

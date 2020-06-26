@@ -45,33 +45,31 @@ router.post("/solicitacao", (request, response, next) => {
       emailModel.smtp = config.email.smtp;
 
       fs.readdir(config.uploadDir, (err, filenames) => {
-        fileService.openFilesAsStreamAsync(filenames).then((data) => {
-            if (data != null && data.length > 0) {
+        if (filenames.length > 0) {
+          fileService.openFilesAsStreamAsync(filenames).then((data) => {            
               data.forEach((item) => {
-                emailModel.options.attachments.push({
-                  filename: item.name,
-                  content: item.bytes,
-                });
-              });              
-           
-              emailService.send(emailModel).then(() => {
-                response.status(config.statusCode.success).send({message: "the data was sent successfuly!", success: true});                
-                fileService.removeFilesAsync(filenames).then(() => {
-                  console.log('file removed');
-                })
-                .catch((err) => {
-                   console.log(err);
-                });
-              })
-              .catch((err) => {
-                response.status(config.statusCode.boom).send({ message: err.message, success: false});
-              });
-            }
+                emailModel.options.attachments.push({ filename: item.name, content: item.bytes });
+              });           
           })
           .catch((err) => {
             response.status(config.statusCode.boom).send({ message: err.message, success : false });
-          })
-        });
+          });            
+        }             
+        emailService.send(emailModel).then(() => {
+          response.status(config.statusCode.success).send({message: "A mensagem foi enviada com sucesso!", success: true});                
+          if (filenames.length > 0) {
+            fileService.removeFilesAsync(filenames).then(() => {
+              console.log('Os arquivos foram removidos do servidor!');
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+          }
+        })
+        .catch((err) => {
+          response.status(config.statusCode.boom).send({ message: err.message, success: false});
+        });                    
+      });     
     } else {
         response.status(config.statusCode.bad).send({ message: err.message, success: false });
     }
