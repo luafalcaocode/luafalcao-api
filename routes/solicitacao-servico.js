@@ -17,16 +17,27 @@ router.post("/solicitacao", (request, response, next) => {
   form.uploadDir = path.join(__dirname, "../", "uploads");
   form.maxFileSize = 25 * 1024 * 1024;
 
+  const requestId = request.headers['custom-request-id'];
+  const requestDir = path.join(form.uploadDir, requestId.toString().split('/').join('.').split(':').join('.'));
+
   fs.access(form.uploadDir, (err) => {
     if (err && err.code === "ENOENT") {
       fs.mkdir(form.uploadDir, (err) => {
-        console.log(err);
+        if (err) console.log('diretório de uploads criado com sucesso.');
       });
     }
+
+    fs.access(requestDir, (err) => {
+      if (err && err.code === 'ENOENT') {
+        fs.mkdir(requestDir, (err) => {
+          if (err) console.log('diretório com o id da requisição criado com sucesso.');
+        });
+      }
+    })
   });
 
   form.on("file", (field, file) => {
-    fs.renameSync(file.path, path.join(form.uploadDir, file.name));
+    fs.renameSync(file.path, path.join(requestDir, file.name));
   });
 
   form.parse(request, (err, fields, files) => {
@@ -44,8 +55,8 @@ router.post("/solicitacao", (request, response, next) => {
       };
       emailModel.smtp = config.email.smtp;
 
-      fs.readdir(config.uploadDir, (err, filenames) => {
-          fileService.openFilesAsStreamAsync(filenames).then((data) => {            
+      fs.readdir(requestDir, (err, filenames) => {
+          fileService.openFilesAsStreamAsync(filenames, requestDir).then((data) => {            
               data.forEach((item) => {
                 emailModel.options.attachments.push({ filename: item.name, content: item.bytes });
               });           
@@ -54,10 +65,10 @@ router.post("/solicitacao", (request, response, next) => {
             response.status(config.statusCode.boom).send({ message: err.message, success : false });
           }).finally(() => {
             emailService.send(emailModel).then(() => {
-              response.status(config.statusCode.success).send({message: "A mensagem foi enviada com sucesso!", success: true});                
+              response.status(config.statusCode.success).send({message: "A mensagem foi enviada com sucesso.", success: true});                
               if (filenames.length > 0) {
-                fileService.removeFilesAsync(filenames).then(() => {
-                  console.log('Os arquivos foram removidos do servidor!');
+                fileService.removeDirAsync(requestDir).then(() => {
+                  console.log('Os arquivos e a pasta foram removidos do servidor.');
                 })
                 .catch((err) => {
                     console.log(err);
