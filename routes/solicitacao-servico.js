@@ -31,14 +31,14 @@ router.post("/solicitacao", (request, response, next) => {
       if (err && err.code === 'ENOENT') {
         fs.mkdir(requestDir, (err) => {
           if (!err) console.log('diretório com o id da requisição criado com sucesso.');
+            form.on("file", (field, file) => {
+              fs.renameSync(file.path, path.join(requestDir, file.name));
+            });
         });
       }
     })
   });
 
-  form.on("file", (field, file) => {
-    fs.renameSync(file.path, path.join(requestDir, file.name));
-  });
 
   form.parse(request, (err, fields, files) => {
     if (!err) {
