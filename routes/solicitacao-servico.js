@@ -23,14 +23,14 @@ router.post("/solicitacao", (request, response, next) => {
   fs.access(form.uploadDir, (err) => {
     if (err && err.code === "ENOENT") {
       fs.mkdir(form.uploadDir, (err) => {
-        if (err) console.log('diretório de uploads criado com sucesso.');
+        if (!err) console.log('diretório de uploads criado com sucesso.');
       });
     }
 
     fs.access(requestDir, (err) => {
       if (err && err.code === 'ENOENT') {
         fs.mkdir(requestDir, (err) => {
-          if (err) console.log('diretório com o id da requisição criado com sucesso.');
+          if (!err) console.log('diretório com o id da requisição criado com sucesso.');
         });
       }
     })
