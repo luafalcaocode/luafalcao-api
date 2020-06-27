@@ -16,7 +16,7 @@ const fileService = {
 
       //stream.push({ name: file, bytes: Buffer.concat(temp) });
       stream.push({name: file, bytes: fs.createReadStream(path.join(requestDir, file))});
-      temp = [];
+      //temp = [];
     }
 
     return stream;
