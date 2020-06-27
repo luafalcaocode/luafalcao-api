@@ -8,13 +8,14 @@ const fileService = {
     let temp = [];
 
     for await (const file of files) {
-      for await (const chunk of fs.createReadStream(
-        path.join(requestDir, file)
-      )) {
-        temp.push(chunk);
-      }
+      // for await (const chunk of fs.createReadStream(
+      //   path.join(requestDir, file)
+      // )) {
+      //   temp.push(chunk);
+      // }
 
-      stream.push({ name: file, bytes: Buffer.concat(temp) });
+      //stream.push({ name: file, bytes: Buffer.concat(temp) });
+      stream.push({name: file, bytes: fs.createReadStream(path.join(requestDir, file))});
       temp = [];
     }
 
