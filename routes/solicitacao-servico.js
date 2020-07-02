@@ -15,7 +15,7 @@ router.post("/solicitacao", (request, response, next) => {
   const form = new formidable.IncomingForm();
   form.multiples = true;
   form.uploadDir = path.join(__dirname, "../", "uploads");
-  form.maxFileSize = 25 * 1024 * 1024;
+  form.maxFileSize = 5 * 1024 * 1024;
 
   const requestId = request.headers['custom-request-id'];
   const requestDir = path.join(form.uploadDir, requestId.toString().split('/').join('.').split(':').join('.'));
@@ -29,6 +29,7 @@ router.post("/solicitacao", (request, response, next) => {
 
     fs.access(requestDir, (err) => {
       if (err && err.code === 'ENOENT') {
+        console.log(err);
         fs.mkdir(requestDir, (err) => {
           if (!err) console.log('diretório com o id da requisição criado com sucesso.');
             form.on("file", (field, file) => {
@@ -62,11 +63,12 @@ router.post("/solicitacao", (request, response, next) => {
               });           
           })
           .catch((err) => {
-            response.status(config.statusCode.boom).send({ message: err.message, success : false });
+            console.log(err);            
           }).finally(() => {
             emailService.send(emailModel).then(() => {
+              console.log('email enviado com sucesso...');
               response.status(config.statusCode.success).send({message: "A mensagem foi enviada com sucesso.", success: true});                
-              if (filenames.length > 0) {
+              if (filenames && filenames.length > 0) {
                 fileService.removeDirAsync(requestDir).then(() => {
                   console.log('Os arquivos e a pasta foram removidos do servidor.');
                 })
@@ -76,11 +78,13 @@ router.post("/solicitacao", (request, response, next) => {
               }
             })
             .catch((err) => {
+              console.log(err);
               response.status(config.statusCode.boom).send({ message: err.message, success: false});
             });
           });            
      });     
     } else {
+        console.log(err);
         response.status(config.statusCode.bad).send({ message: err.message, success: false });
     }
   });
