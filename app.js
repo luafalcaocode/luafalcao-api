@@ -6,7 +6,7 @@ const fs = require('fs');
 
 const config = require('./config/config');
 const servicesRoutes = require('./routes/servicesRoute');
-const notFoundController = require('./controllers/404Controller');
+const generalRoutes = require('./routes/generalRoute');
 
 const credentials = { key: fs.readFileSync('key.pem', 'utf8'), cert: fs.readFileSync('cert.pem', 'utf8') };
 
@@ -17,7 +17,7 @@ app.set('views', 'views');
 app.use(cors());
 
 app.use('/api/servicos', servicesRoutes);
-app.use('/', notFoundController.notFound);
+app.use('/', generalRoutes);
 
 app.listen(5523);
 https.createServer(credentials, app).listen(3333);
